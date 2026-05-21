@@ -16,25 +16,43 @@ connection.connect((err) => {
 
   console.log("MySQL Connected Successfully");
 
-  const createStudentsTableQuery = `
-    CREATE TABLE IF NOT EXISTS Students (
+    const createUsersTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE
     )
   `;
 
-  connection.query(createStudentsTableQuery, (err) => {
+  connection.query(createUsersTableQuery, (err) => {
     if (err) {
-      console.error("Error creating students table:", err);
+      console.error("Error creating users table:", err);
       connection.end();
       return;
     }
 
-    console.log("Students table created or already exists");
+    console.log("Users table created or already exists");
   });
 
-  connection.end();
+  
+  const createBusesTableQuery = `
+    CREATE TABLE IF NOT EXISTS buses (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      bus_number VARCHAR(255) NOT NULL,
+      total_seats INT NOT NULL,
+      available_seats INT NOT NULL
+    )
+  `;
+
+  connection.query(createBusesTableQuery, (err) => {
+    if (err) {
+      console.error("Error creating buses table:", err);
+      connection.end();
+      return;
+    }
+
+    console.log("Buses table created or already exists");
+  });
 });
 
 module.exports = connection;
