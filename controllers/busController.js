@@ -1,54 +1,59 @@
-const connection = require("../utils/db-connection");
+const { Op } = require("sequelize");
+
+const Buses = require("../models/buses");
 
 
-const addBus = (req, res) => {
+const createBus = async (req, res) => {
 
-  const { bus_number, total_seats, available_seats } = req.body;
+  try {
 
-  const query = `
-    INSERT INTO buses (bus_number, total_seats, available_seats)
-    VALUES (?, ?, ?)
-  `;
+    const { busNumber, totalSeats, availableSeats } = req.body;
 
-  connection.execute(
-    query,
-    [bus_number, total_seats, available_seats],
-    (err, result) => {
+    const bus = await Buses.create({
+      busNumber,
+      totalSeats,
+      availableSeats
+    });
 
-      if (err) {
-        console.log(err);
-        return res.status(500).send("Error adding bus");
+    console.log("Bus inserted");
+
+    res.status(201).json(bus);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).send("Error creating bus");
+  }
+};
+
+
+const getAvailableBuses = async (req, res) => {
+
+  try {
+
+    const { seats } = req.params;
+
+    const buses = await Buses.findAll({
+      where: {
+        availableSeats: {
+          [Op.gt]: seats
+        }
       }
+    });
 
-      res.send("Bus added successfully");
-    }
-  );
+    res.json(buses);
 
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).send("Error fetching buses");
+  }
 };
 
-
-const getAvailableBuses = (req, res) => {
-
-  const seats = req.params.seats;
-
-  const query = `
-    SELECT * FROM buses
-    WHERE available_seats > ?
-  `;
-
-  connection.execute(query, [seats], (err, result) => {
-
-    if (err) {
-      console.log(err);
-      return res.status(500).send("Error fetching buses");
-    }
-
-    res.json(result);
-  });
-
-};
 
 module.exports = {
-  addBus,
+  createBus,
   getAvailableBuses
 };
