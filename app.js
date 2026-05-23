@@ -2,32 +2,35 @@ require("dotenv").config();
 
 const express = require("express");
 const sequelize = require("./utils/db-connection");
+
+require("./models");
+
 const userRoutes = require("./routes/userRoutes");
 const busRoutes = require("./routes/busRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Bus Booking API Running");
+  res.send("Server Running");
 });
+
 
 app.use("/users", userRoutes);
 app.use("/buses", busRoutes);
+app.use("/bookings", bookingRoutes);
 
 
-sequelize.sync({ force: false })
-  .then(async () => {
+sequelize.sync()
+  .then(() => {
 
-    console.log("Tables created successfully");
-
-    const PORT = process.env.PORT || 3000;
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(3000, () => {
+      console.log("Server running on port 3000");
     });
+
   })
-  .catch((err) => {
-    console.log(err);
+  .catch((error) => {
+    console.log(error);
   });
